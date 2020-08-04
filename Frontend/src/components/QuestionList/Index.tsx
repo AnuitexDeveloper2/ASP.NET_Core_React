@@ -8,9 +8,10 @@ import { Question } from './Question';
 interface Props {
   data: QuestionData[];
   showContent?: boolean;
+  renderItem?: (item: QuestionData) => JSX.Element;
 }
 
-export const QuestionList: React.FC<Props> = ({ data }) => (
+export const QuestionList: React.FC<Props> = ({ data, renderItem }) => (
   <ul
     css={css`
       list-style: none;
@@ -33,7 +34,7 @@ export const QuestionList: React.FC<Props> = ({ data }) => (
           }
         `}
       >
-        <Question data={question} showContent={true} />
+        {renderItem ? renderItem(question) : <Question data={question} />}
       </li>
     ))}
   </ul>

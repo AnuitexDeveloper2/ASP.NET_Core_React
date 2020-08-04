@@ -6,10 +6,10 @@ import { gray3, gray2 } from '../../Styles';
 
 interface Props {
   data: QuestionData;
-  showContent: boolean;
+  showContent?: boolean;
 }
 
-export const Question: React.FC<Props> = ({ data, showContent }) => (
+export const Question: React.FC<Props> = ({ data, showContent = true }) => (
   <div
     css={css`
       padding: 10px 0px;
