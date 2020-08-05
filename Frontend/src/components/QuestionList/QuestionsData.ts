@@ -50,5 +50,27 @@ const questions: QuestionData[] = [
 ];
 
 export const getUnansweredQuestions = (): QuestionData[] => {
-  return questions.filter((q) => q.answers.length === 0);
+  return questions.filter((q) => q.answers.length !== 0);
+};
+const wait = (ms: number): Promise<void> => {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+};
+
+export const getQuestion = async (
+  questionId: number,
+): Promise<QuestionData | null> => {
+  await wait(500);
+  const results = questions.filter((q) => q.questionId === questionId);
+  return results.length === 0 ? null : results[0];
+};
+
+export const searchQuestions = async (
+  criteria: string,
+): Promise<QuestionData[]> => {
+  await wait(500);
+  return questions.filter(
+    (q) =>
+      q.title.toLowerCase().indexOf(criteria.toLowerCase()) >= 0 ||
+      q.content.toLowerCase().indexOf(criteria.toLowerCase()) >= 0,
+  );
 };
