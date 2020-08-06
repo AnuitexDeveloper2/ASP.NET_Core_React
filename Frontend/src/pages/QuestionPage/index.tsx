@@ -1,11 +1,17 @@
 import React, { useState, useEffect, Fragment } from 'react';
 import { Page } from '../../components/PageTitle';
 import { RouteComponentProps } from 'react-router-dom';
-import { QuestionData, getQuestion } from '../../components/QuestionList/QuestionsData';
+import {
+  QuestionData,
+  getQuestion,
+} from '../../components/QuestionList/QuestionsData';
 /** @jsx jsx */
 import { css, jsx } from '@emotion/core';
 import { gray3, gray6 } from '../../Styles';
 import { AnswerList } from '../../components/AmswerList';
+import { Field } from '../../components/Field/Field';
+import { Form } from '../../components/Form/Form';
+import { required, minLength } from '../../shared/validator';
 
 interface RouteParams {
   questionId: string;
@@ -70,6 +76,27 @@ export const QuestionPage: React.FC<RouteComponentProps<RouteParams>> = ({
                 ${question.created.toLocaleTimeString()}`}
             </div>
             <AnswerList data={question.answers} />
+            <div
+              css={css`
+                margin-top: 20px;
+              `}
+            >
+              <Form
+                validationRules={{
+                  title: [
+                    { validator: required },
+                    { validator: minLength, arg: 10 },
+                  ],
+                  content: [
+                    { validator: required },
+                    { validator: minLength, arg: 50 },
+                  ],
+                }}
+                submitCaption="Submit Your Answer"
+              >
+                <Field name="content" label="Your Answer" type="TextArea" />
+              </Form>
+            </div>
           </Fragment>
         )}
       </div>
