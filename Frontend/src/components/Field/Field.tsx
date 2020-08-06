@@ -34,7 +34,6 @@ export const Field: React.FC<Props> = ({ name, label, type = 'Text' }) => {
   const handleChange = (
     e: ChangeEvent<HTMLInputElement> | ChangeEvent<HTMLTextAreaElement>,
   ) => {
-    handleBlur();
     if (setValue) {
       setValue(name, e.currentTarget.value);
     }

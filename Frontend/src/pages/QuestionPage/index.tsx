@@ -4,13 +4,14 @@ import { RouteComponentProps } from 'react-router-dom';
 import {
   QuestionData,
   getQuestion,
+  postAnswer,
 } from '../../components/QuestionList/QuestionsData';
 /** @jsx jsx */
 import { css, jsx } from '@emotion/core';
 import { gray3, gray6 } from '../../Styles';
 import { AnswerList } from '../../components/AmswerList';
 import { Field } from '../../components/Field/Field';
-import { Form } from '../../components/Form/Form';
+import { Form, Values } from '../../components/Form/Form';
 import { required, minLength } from '../../shared/validator';
 
 interface RouteParams {
@@ -33,6 +34,17 @@ export const QuestionPage: React.FC<RouteComponentProps<RouteParams>> = ({
       doGetQuestion(questionId);
     }
   }, [id, location.search]);
+
+  const handleSubmit = async (values: Values) => {
+    const result = await postAnswer({
+      questionId: question!.questionId,
+      content: values.content,
+      userName: 'Fred',
+      created: new Date(),
+    });
+    return { success: result ? true : false };
+  };
+
   return (
     <Page>
       <div
@@ -82,14 +94,13 @@ export const QuestionPage: React.FC<RouteComponentProps<RouteParams>> = ({
               `}
             >
               <Form
+                onSubmit={handleSubmit}
+                failureMessage="There was a problem with your answer"
+                successMessage="Your answer was successfully submitted"
                 validationRules={{
-                  title: [
-                    { validator: required },
-                    { validator: minLength, arg: 10 },
-                  ],
                   content: [
                     { validator: required },
-                    { validator: minLength, arg: 50 },
+                    { validator: minLength, arg: 10 },
                   ],
                 }}
                 submitCaption="Submit Your Answer"

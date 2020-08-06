@@ -1,10 +1,9 @@
-import React, { ChangeEvent, useState } from 'react';
+import React, { ChangeEvent, useState, FormEvent } from 'react';
 import { UserIcon } from '../images/user';
 /** @jsx jsx */
 import { css, jsx } from '@emotion/core';
 import { gray1, fontFamily, fontSize, gray5, gray2 } from '../../Styles';
 import { Link, RouteComponentProps, withRouter } from 'react-router-dom';
-import { Form } from '../Form/Form';
 
 const Header: React.FC<RouteComponentProps> = ({ history, location }) => {
   const searchParams = new URLSearchParams(location.search);
@@ -13,6 +12,12 @@ const Header: React.FC<RouteComponentProps> = ({ history, location }) => {
   const handleSearchInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     setSearch(e.currentTarget.value);
   };
+
+  const handleSearchSubmit = (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    history.push(`/search?criteria=${search}`);
+  };
+
   return (
     <div
       css={css`
@@ -40,7 +45,7 @@ const Header: React.FC<RouteComponentProps> = ({ history, location }) => {
       >
         Q & A
       </Link>
-      <form action="">
+      <form onSubmit={handleSearchSubmit}>
         <input
           type="text"
           value={search}
