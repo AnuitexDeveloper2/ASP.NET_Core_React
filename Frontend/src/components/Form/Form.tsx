@@ -11,7 +11,8 @@ export interface Values {
 interface Props {
   submitCaption?: string;
   validationRules?: ValidationProp;
-  onSubmit: (value: Values) => Promise<SubmitResult>;
+  onSubmit: (value: Values) => Promise<SubmitResult> | void;
+  submitResult?: SubmitResult;
   successMessage?: string;
   failureMessage?: string;
 }
@@ -57,6 +58,7 @@ export const Form: React.FC<Props> = ({
   children,
   validationRules,
   onSubmit,
+  submitResult,
   successMessage = 'Success!',
   failureMessage = 'Something went wrong',
 }) => {
@@ -105,12 +107,26 @@ export const Form: React.FC<Props> = ({
     return !haveError;
   };
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const disabled = submitResult
+    ? submitResult.success
+    : submitting || (submitted && !submitError);
+  const showError = submitResult
+    ? !submitResult.success
+    : submitted && submitError;
+  const showSuccess = submitResult
+    ? submitResult.success
+    : submitted && !submitError;
+
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     if (validateForm()) {
       setSubmitting(true);
       setSubmitError(false);
       const result = await onSubmit(values);
+      if (result === undefined) {
+        return;
+      }
       setErrors(result.errors || {});
       setSubmitError(!result.success);
       setSubmitting(false);
@@ -139,7 +155,7 @@ export const Form: React.FC<Props> = ({
           css={css`
             margin: 10px auto 0 auto;
             padding: 30px;
-            width: 350px;
+            width: 70%;
             background-color: ${gray6};
             border-radius: 4px;
             border: 1px solid ${gray5};
@@ -156,7 +172,7 @@ export const Form: React.FC<Props> = ({
           >
             <PrimaryButton type="submit">{submitCaption}</PrimaryButton>
           </div>
-          {submitted && submitError && (
+          {showError && (
             <p
               css={css`
                 color: red;
@@ -165,7 +181,7 @@ export const Form: React.FC<Props> = ({
               {failureMessage}
             </p>
           )}
-          {submitted && !submitError && (
+          {showSuccess && (
             <p
               css={css`
                 color: green;

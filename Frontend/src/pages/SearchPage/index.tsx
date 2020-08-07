@@ -1,26 +1,32 @@
-import React, { FC, useState, useEffect } from 'react';
+import React, { FC, useEffect } from 'react';
 import { RouteComponentProps } from 'react-router-dom';
 import { Page } from '../../components/PageTitle';
 import { QuestionList } from '../../components/QuestionList/Index';
-import {
-  searchQuestions,
-  QuestionData,
-} from '../../components/QuestionList/QuestionsData';
+import { QuestionData } from '../../components/QuestionList/QuestionsData';
 /** @jsx jsx */
 import { css, jsx } from '@emotion/core';
+import { connect } from 'react-redux';
+import { AppState } from '../../redux/reducers/rootReducer';
+import { AnyAction } from 'redux';
+import { ThunkDispatch } from 'redux-thunk';
+import { searchQuestionsActionCreator } from '../../redux/actions/searchQuestions';
 
-export const SearchPage: React.FC<RouteComponentProps> = ({ location }) => {
-  const [questions, setQuestions] = useState<QuestionData[]>([]);
+interface Props extends RouteComponentProps {
+  searchQuestions: (criteria: string) => Promise<void>;
+  questions: QuestionData[] | null;
+}
+
+const SearchPage: React.FC<Props> = ({
+  location,
+  searchQuestions,
+  questions,
+}) => {
   const searchParams = new URLSearchParams(location.search);
   const search = searchParams.get('criteria') || '';
 
   useEffect(() => {
-    const doSearch = async (criteria: string) => {
-      const foundResults = await searchQuestions(criteria);
-      setQuestions(foundResults);
-    };
-    doSearch(search);
-  }, [search]);
+    searchQuestions(search);
+  }, [questions, search, searchQuestions]);
 
   return (
     <Page title="Search Results">
@@ -36,7 +42,22 @@ export const SearchPage: React.FC<RouteComponentProps> = ({ location }) => {
           f or "{search}"
         </p>
       )}
-      <QuestionList data={questions} />
+      <QuestionList data={questions || []} />
     </Page>
   );
 };
+
+const mapStateToProps = (state: AppState) => {
+  return {
+    questions: state.questions.unanswered,
+  };
+};
+
+const mapDispatchToProps = (dispatch: ThunkDispatch<any, any, AnyAction>) => {
+  return {
+    searchQuestions: (criteria: string) =>
+      dispatch(searchQuestionsActionCreator(criteria)),
+  };
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(SearchPage);
