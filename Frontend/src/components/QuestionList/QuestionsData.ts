@@ -60,7 +60,7 @@ export const getQuestion = async (
   questionId: string,
 ): Promise<QuestionData | null> => {
   await wait(500);
-  const id = parseInt(questionId)
+  const id = parseInt(questionId);
   const results = questions.filter((q) => q.questionId === id);
   return results.length === 0 ? null : results[0];
 };

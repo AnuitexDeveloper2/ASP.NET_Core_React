@@ -1,9 +1,8 @@
-import React, { useState, useEffect, Fragment } from 'react';
+import React, { useEffect, Fragment } from 'react';
 import { Page } from '../../components/PageTitle';
 import { RouteComponentProps } from 'react-router-dom';
 import {
   QuestionData,
-  getQuestion,
   postAnswer,
 } from '../../components/QuestionList/QuestionsData';
 /** @jsx jsx */
@@ -45,7 +44,6 @@ const QuestionPage: React.FC<Props> = ({ location, question, getQuestion }) => {
     });
     return { success: result ? true : false };
   };
-  debugger
   if (question !== undefined) {
     return (
       <Page>
@@ -116,11 +114,19 @@ const QuestionPage: React.FC<Props> = ({ location, question, getQuestion }) => {
       </Page>
     );
   }
-  return <NotFoundPage />;
+  return (
+    <div
+      css={css`
+        margin-top: 100px;
+        text-align: center;
+      `}
+    >
+      Loading...
+    </div>
+  );
 };
 
 const mapStateToProps = (state: AppState) => {
-  debugger
   return {
     question: state.questions.postedResult,
   };

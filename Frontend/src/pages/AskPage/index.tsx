@@ -42,11 +42,10 @@ const AskPage: React.FC<Props> = ({
     });
     return await { success: true };
   };
-
   let submitResult: SubmitResult | undefined;
-  if (postedQuestionResult) {
-    submitResult = { success: postedQuestionResult !== undefined };
-  }
+  // if (postedQuestionResult) {
+  //   submitResult = { success: postedQuestionResult !== undefined };
+  // }
 
   return (
     <Page title="Ask Page">
