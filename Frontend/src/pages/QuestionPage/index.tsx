@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, Fragment } from 'react';
 import { Page } from '../../components/PageTitle';
 import { RouteComponentProps } from 'react-router-dom';
@@ -17,8 +18,11 @@ import { AppState } from '../../redux/reducers/rootReducer';
 import { AnyAction } from 'redux';
 import { ThunkDispatch } from 'redux-thunk';
 import { getQuestionActionCretaor } from '../../redux/actions/getQuestion';
-import { NotFoundPage } from '../NotFoundPage';
-
+import {
+  HubConnectionBuilder,
+  HubConnectionState,
+  HubConnection,
+} from '@microsoft/signalr';
 interface RouteParams {
   questionId: string;
 }
@@ -31,9 +35,68 @@ interface Props extends RouteComponentProps {
 const QuestionPage: React.FC<Props> = ({ location, question, getQuestion }) => {
   const searchParams = new URLSearchParams(location.search);
   const id = searchParams.get('id') || '';
+
+  const setUpSignalRConnection = async (questionId: number) => {
+    const connection = new HubConnectionBuilder()
+      .withUrl('http://localhost:44310/questionshub')
+      .withAutomaticReconnect()
+      .build();
+    connection.on('Message', (message: string) => {
+      console.log('Message', message);
+    });
+    connection.on('ReceiveQuestion', (newQuestion: QuestionData) => {
+      console.log('ReceiveQuestion', newQuestion);
+      question = newQuestion;
+    });
+    try {
+      await connection.start();
+    } catch (err) {
+      console.log(err);
+    }
+    if (connection.state === HubConnectionState.Connected) {
+      connection.invoke('SubscribeQuestion', questionId).catch((err: Error) => {
+        return console.error(err.toString());
+      });
+    }
+    return connection;
+  };
+
+  const cleanUpSignalRConnection = async (
+    questionId: number,
+    connection: HubConnection,
+  ) => {
+    if (connection.state === HubConnectionState.Connected) {
+      try {
+        await connection.invoke('UnsubscribeQuestion', questionId);
+      } catch (err) {
+        return console.error(err.toString());
+      }
+      connection.off('Message');
+      connection.off('ReceiveQuestion');
+      connection.stop();
+    } else {
+      connection.off('Message');
+      connection.off('ReceiveQuestion');
+      connection.stop();
+    }
+  };
+
   useEffect(() => {
     getQuestion(id);
-  }, [getQuestion, id]);
+    debugger;
+    let connection: HubConnection;
+    debugger
+    setUpSignalRConnection(parseInt(id)).then((con) => {
+      connection = con;
+    });
+
+    return function cleanUp() {
+      if (id) {
+        const questionId = Number(id);
+        cleanUpSignalRConnection(questionId, connection);
+      }
+    };
+  }, [getQuestion, id, setUpSignalRConnection]);
 
   const handleSubmit = async (values: Values) => {
     const result = await postAnswer({
