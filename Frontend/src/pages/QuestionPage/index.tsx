@@ -38,7 +38,7 @@ const QuestionPage: React.FC<Props> = ({ location, question, getQuestion }) => {
 
   const setUpSignalRConnection = async (questionId: number) => {
     const connection = new HubConnectionBuilder()
-      .withUrl('http://localhost:44310/questionshub')
+      .withUrl('http://localhost:49522/questionshub')
       .withAutomaticReconnect()
       .build();
     connection.on('Message', (message: string) => {
@@ -83,20 +83,17 @@ const QuestionPage: React.FC<Props> = ({ location, question, getQuestion }) => {
 
   useEffect(() => {
     getQuestion(id);
-    debugger;
     let connection: HubConnection;
-    debugger
     setUpSignalRConnection(parseInt(id)).then((con) => {
       connection = con;
     });
-
     return function cleanUp() {
       if (id) {
         const questionId = Number(id);
         cleanUpSignalRConnection(questionId, connection);
       }
     };
-  }, [getQuestion, id, setUpSignalRConnection]);
+  }, [id]);
 
   const handleSubmit = async (values: Values) => {
     const result = await postAnswer({

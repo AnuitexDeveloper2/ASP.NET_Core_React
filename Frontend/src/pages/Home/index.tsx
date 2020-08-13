@@ -34,7 +34,6 @@ const HomePage: FC<Props> = ({
   const handleAskQuestionClick = () => {
     history.push('/ask');
   };
-
   return (
     <Page>
       <div

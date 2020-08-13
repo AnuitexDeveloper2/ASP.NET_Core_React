@@ -11,6 +11,8 @@ interface Props {
 }
 
 export const Question: React.FC<Props> = ({ data, showContent = true }) => {
+  const dateCreated = new Date(data.created).toLocaleDateString();
+  const timeCreated = new Date(data.created).toLocaleTimeString();
   return (
     <div
       css={css`
@@ -57,7 +59,7 @@ export const Question: React.FC<Props> = ({ data, showContent = true }) => {
         `}
       >
         {`Asked by ${data.userName} on
-    ${data.created.toLocaleDateString()} ${data.created.toLocaleTimeString()}`}
+    ${dateCreated} ${timeCreated}`}
       </div>
     </div>
   );

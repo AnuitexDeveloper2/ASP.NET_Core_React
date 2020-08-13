@@ -49,7 +49,7 @@ namespace WebApplication1
             options.AddPolicy("CorsPolicy", builder =>
             builder.AllowAnyMethod()
             .AllowAnyHeader()
-            .WithOrigins("http://localhost:8000")
+            .WithOrigins("http://localhost:3000")
             .AllowCredentials()));
             services.AddSignalR();
         }
@@ -58,7 +58,7 @@ namespace WebApplication1
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILoggerFactory loggerFactory)
         {
             //loggerFactory.AddFile("Logs/mylog-{Date}.txt");
-
+            app.UseCors("CorsPolicy");
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();

@@ -1,3 +1,4 @@
+import axios from 'axios';
 export interface QuestionData {
   questionId: number;
   title: string;
@@ -49,8 +50,9 @@ const questions: QuestionData[] = [
   },
 ];
 
-export const getUnansweredQuestions = (): QuestionData[] => {
-  return questions;
+export const getUnansweredQuestions = async (): Promise<QuestionData[]> => {
+  const request = await axios.get('https://localhost:44310/questions');
+  return request.data;
 };
 const wait = (ms: number): Promise<void> => {
   return new Promise((resolve) => setTimeout(resolve, ms));
