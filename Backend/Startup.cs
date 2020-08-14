@@ -1,13 +1,16 @@
 using DbUp;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using QandA.Authorization;
 using QandA.Data;
 using QandA.Hubs;
+using QandA.Initializer;
 
 namespace WebApplication1
 {
@@ -38,8 +41,7 @@ namespace WebApplication1
             }
 
             services.AddControllers();
-
-            services.AddScoped<IDataRepository, DataRepository>();
+            Initializer.initServices(services);
             services.AddCors(options =>
             options.AddPolicy("CorsPolicy", builder =>
             builder.AllowAnyMethod()
@@ -61,9 +63,7 @@ namespace WebApplication1
 
             services.AddHttpClient();
             services.AddAuthorization(options =>
-            options.AddPolicy("MustBeQuestionAuthor", policy =>
-            policy.Requirements
-            .Add(new MustBeQuestionAuthorRequirement())));
+                 options.AddPolicy("MustBeQuestionAuthor", policy => policy.Requirements.Add(new MustBeQuestionAuthorRequirement())));
             services.AddScoped<IAuthorizationHandler, MustBeQuestionAuthorHandler>();
         }
 

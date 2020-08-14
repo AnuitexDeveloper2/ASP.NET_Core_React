@@ -13,17 +13,19 @@ interface Props {
 export const Question: React.FC<Props> = ({ data, showContent = true }) => {
   const dateCreated = new Date(data.created).toLocaleDateString();
   const timeCreated = new Date(data.created).toLocaleTimeString();
+  const answers = data.answers;
   let answersLenght = 0;
-  const getAnswerLenght = () =>{
+  const getAnswerLenght = () => {
     if (data !== null) {
-      for (let i = 0; i < data.answers.length; i++) {
-        if (data.answers[i].content !== null) {
+      for (let i = 0; i < answers.length; i++) {
+        if (answers[i].content !== null) {
           answersLenght++;
         }
       }
     }
   };
   getAnswerLenght();
+  getAnswerLenght()
   return (
     <div
       css={css`
