@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using QandA.Hubs;
 using Microsoft.AspNetCore.Mvc;
 using QandA.Data;
 using QandA.Data.Models;
 using Microsoft.AspNetCore.SignalR;
+using Microsoft.AspNetCore.Authorization;
 
 namespace QandA.Controllers
 {
@@ -25,22 +25,29 @@ namespace QandA.Controllers
 
 
         [HttpGet]
-        public IEnumerable<QuestionGetManyResponse> GetQuestions(string search)
+        public IEnumerable<QuestionGetManyResponse> GetQuestions(string search, bool includeAnswers, int page = 1, int pageSize = 20)
         {
             if (string.IsNullOrEmpty(search))
             {
-                return _dataRepository.GetQuestions();
+                if (includeAnswers)
+                {
+                    return _dataRepository.GetQuestionsWithAnswers();
+                }
+                else
+                {
+                    return _dataRepository.GetQuestions();
+                }
             }
             else
             {
-                return _dataRepository.GetQuestionsBySearch(search);
+                return _dataRepository.GetQuestionsBySearchWithPaging(search, page, pageSize);
             }
         }
 
         [HttpGet("unanswered")]
-        public IEnumerable<QuestionGetManyResponse> GetUnansveredQuestions()
+        public async Task<IEnumerable<QuestionGetManyResponse>> GetUnansveredQuestionsAsync()
         {
-            return _dataRepository.GetUnansweredQuestions();
+            return await _dataRepository.GetUnansweredQuestionsAsync();
         }
 
         [HttpGet("getQuestionId")]
@@ -54,6 +61,7 @@ namespace QandA.Controllers
             return question;
         }
 
+        [Authorize]
         [HttpPost]
         public ActionResult<QuestionGetSingleResponse> CreatePost(QuestionPostFullRequest questionPost)
         {
@@ -74,6 +82,7 @@ namespace QandA.Controllers
             result);
         }
 
+        [Authorize]
         [HttpPut]
         public ActionResult<QuestionGetSingleResponse> PutQuestion(int questionId, QuestionPutRequest questionPut)
         {
@@ -92,6 +101,7 @@ namespace QandA.Controllers
             return savedQuestion;
         }
 
+        [Authorize]
         [HttpDelete]
         public ActionResult DeleteQuestion(int questionId)
         {
@@ -104,6 +114,7 @@ namespace QandA.Controllers
             return NoContent();
         }
 
+        [Authorize]
         [HttpPost("answer")]
         public ActionResult<AnswerGetResponse> PostAnswer(AnswerPostRequest answerPostRequest)
         {

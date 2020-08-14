@@ -1,10 +1,13 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { useEffect, Fragment } from 'react';
+import React, { useEffect, Fragment, useState } from 'react';
 import { Page } from '../../components/PageTitle';
 import { RouteComponentProps } from 'react-router-dom';
 import {
+  mapQuestionFromServer,
+  QuestionDataFromServer,
   QuestionData,
   postAnswer,
+  getQuestion,
 } from '../../components/QuestionList/QuestionsData';
 /** @jsx jsx */
 import { css, jsx } from '@emotion/core';
@@ -32,7 +35,8 @@ interface Props extends RouteComponentProps {
   getQuestion: (id: string) => Promise<void>;
 }
 
-const QuestionPage: React.FC<Props> = ({ location, question, getQuestion }) => {
+const QuestionPage: React.FC<Props> = ({ location }) => {
+  const [question, setQuestion] = useState<QuestionData | null>(null);
   const searchParams = new URLSearchParams(location.search);
   const id = searchParams.get('id') || '';
 
@@ -44,9 +48,9 @@ const QuestionPage: React.FC<Props> = ({ location, question, getQuestion }) => {
     connection.on('Message', (message: string) => {
       console.log('Message', message);
     });
-    connection.on('ReceiveQuestion', (newQuestion: QuestionData) => {
+    connection.on('ReceiveQuestion', (newQuestion: QuestionDataFromServer) => {
       console.log('ReceiveQuestion', newQuestion);
-      question = newQuestion;
+      setQuestion(mapQuestionFromServer(newQuestion));
     });
     try {
       await connection.start();
@@ -82,11 +86,17 @@ const QuestionPage: React.FC<Props> = ({ location, question, getQuestion }) => {
   };
 
   useEffect(() => {
-    getQuestion(id);
+    const doGetQuestion = async (id: string) => {
+      const foundQuestion = await getQuestion(id);
+      if (foundQuestion !== null) {
+        setQuestion(foundQuestion);
+      }
+    };
     let connection: HubConnection;
     setUpSignalRConnection(parseInt(id)).then((con) => {
       connection = con;
     });
+    doGetQuestion(id);
     return function cleanUp() {
       if (id) {
         const questionId = Number(id);

@@ -21,5 +21,8 @@ namespace QandA.Data
         PutQuestion(int questionId, QuestionPutRequest question);
         void DeleteQuestion(int questionId);
         AnswerGetResponse PostAnswer(AnswerPostFullRequest answer);
+        IEnumerable<QuestionGetManyResponse> GetQuestionsWithAnswers();
+        IEnumerable<QuestionGetManyResponse> GetQuestionsBySearchWithPaging(string search, int pageNumber, int pageSize);
+        Task<IEnumerable<QuestionGetManyResponse>> GetUnansweredQuestionsAsync();
     }
 }

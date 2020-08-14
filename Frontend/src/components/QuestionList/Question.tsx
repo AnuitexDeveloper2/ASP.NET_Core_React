@@ -13,6 +13,17 @@ interface Props {
 export const Question: React.FC<Props> = ({ data, showContent = true }) => {
   const dateCreated = new Date(data.created).toLocaleDateString();
   const timeCreated = new Date(data.created).toLocaleTimeString();
+  let answersLenght = 0;
+  const getAnswerLenght = () =>{
+    if (data !== null) {
+      for (let i = 0; i < data.answers.length; i++) {
+        if (data.answers[i].content !== null) {
+          answersLenght++;
+        }
+      }
+    }
+  };
+  getAnswerLenght();
   return (
     <div
       css={css`
@@ -29,11 +40,30 @@ export const Question: React.FC<Props> = ({ data, showContent = true }) => {
           css={css`
             text-decoration: none;
             color: ${gray2};
+            display: inline-block;
           `}
           to={`questions?id=${data.questionId}`}
         >
           {data.title}
         </Link>
+        <div
+          css={css`
+            float: right;
+            display: inline-block;
+            align-items: right;
+            background-color: #fff;
+            border-radius: 4px;
+            border: 1px solid;
+            border-color: #efd197;
+            font-family: 'Segoe UI', 'Helvetica Neue';
+            font-size: 14px;
+            padding: 2px;
+          `}
+        >
+          <div>{answersLenght}</div>
+          answers
+          <div></div>
+        </div>
       </div>
       <div
         css={css`

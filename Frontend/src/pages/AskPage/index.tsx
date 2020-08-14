@@ -38,6 +38,7 @@ const AskPage: React.FC<Props> = ({
       title: values.title,
       content: values.content,
       userName: 'Fred',
+      userId: '1',
       created: new Date(),
     });
     return await { success: true };
