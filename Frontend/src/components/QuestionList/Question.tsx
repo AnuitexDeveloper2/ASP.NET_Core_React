@@ -25,7 +25,6 @@ export const Question: React.FC<Props> = ({ data, showContent = true }) => {
     }
   };
   getAnswerLenght();
-  getAnswerLenght()
   return (
     <div
       css={css`

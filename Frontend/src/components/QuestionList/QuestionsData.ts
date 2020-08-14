@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { http } from '../../shared/http';
 export interface QuestionData {
   questionId: number;
   title: string;
@@ -57,29 +58,58 @@ export const mapQuestionFromServer = (
 });
 
 export const getUnansweredQuestions = async (): Promise<QuestionData[]> => {
-  const request = await axios.get(
-    `https://localhost:44310/questions?includeAnswers=true`,
-  );
-  return request.data;
+  try {
+    const result = await http<undefined, QuestionDataFromServer[]>({
+      path: '/questions?includeAnswers=true',
+    });
+    if (result.parsedBody) {
+      return result.parsedBody.map(mapQuestionFromServer);
+    } else {
+      return [];
+    }
+  } catch (ex) {
+    console.error(ex);
+    return [];
+  }
 };
 
 export const getQuestion = async (
   questionId: string,
 ): Promise<QuestionData | null> => {
   const id = parseInt(questionId);
-  const results = await axios.get(
-    `https://localhost:44310/questions/getQuestionId?id=${id}`,
-  );
-  return mapQuestionFromServer(results.data);
+  try {
+    const result = await http<undefined, QuestionDataFromServer>({
+      path: `/questions/getQuestionId?id=${id}`,
+    });
+    if (result.ok && result.parsedBody) {
+      return mapQuestionFromServer(result.parsedBody);
+    } else {
+      return null;
+    }
+  } catch (ex) {
+    console.error(ex);
+    return null;
+  }
 };
 
 export const searchQuestions = async (
   criteria: string,
 ): Promise<QuestionData[]> => {
-  const foundedQuestions = await axios.get(
-    `https://localhost:44310/questions/?search=${criteria}`,
-  );
-  return foundedQuestions.data;
+  try {
+    const result = await http<undefined, QuestionDataFromServer[]>({
+      path: `/questions?search=${criteria}`,
+    });
+    if (result.ok && result.parsedBody) {
+      debugger
+      const test = result.parsedBody.map(mapQuestionFromServer);
+      return test
+    } else {
+      return [];
+    }
+  } catch (ex) {
+    console.error(ex);
+    return [];
+  }
 };
 
 export const postQuestion = async (
