@@ -49,7 +49,8 @@ namespace QandA.Controllers
             }
             else
             {
-                return _dataRepository.GetQuestionsBySearchWithPaging(search, page, pageSize);
+                   var result = _dataRepository.GetQuestionsBySearchWithAnswer(search);
+                return result;
             }
         }
 

@@ -41,10 +41,10 @@ namespace QandA.Data
 
         public async Task<QuestionGetSingleResponse> GetQuestion(int questionId)
         {
-            using (var connection =  new SqlConnection(_connectionString))
+            using (var connection = new SqlConnection(_connectionString))
             {
                 await connection.OpenAsync();
-                using (GridReader results =  connection.QueryMultiple(
+                using (GridReader results = connection.QueryMultiple(
                 @"EXEC dbo.Question_GetSingle
                 @QuestionId = @QuestionId;
                 EXEC dbo.Answer_Get_ByQuestionId
@@ -54,7 +54,7 @@ namespace QandA.Data
                     var question = (await results.ReadAsync<QuestionGetSingleResponse>()).FirstOrDefault();
                     if (question != null)
                     {
-                        question.Answers =( await results.ReadAsync<AnswerGetResponse>()).ToList();
+                        question.Answers = (await results.ReadAsync<AnswerGetResponse>()).ToList();
                     }
                     return question;
                 }
@@ -69,6 +69,33 @@ namespace QandA.Data
                 return connection.Query<QuestionGetManyResponse>(
                     @"EXEC dbo.Question_GetMany_BySearch @Search = @Search",
                     new { Search = search });
+            }
+        }
+
+        public IEnumerable<QuestionGetManyResponse> GetQuestionsBySearchWithAnswer(string search)
+        {
+            using (var connection = new SqlConnection(_connectionString))
+            {
+                connection.Open();
+                var questionDictionary = new Dictionary<int, QuestionGetManyResponse>();
+                return connection.Query<QuestionGetManyResponse, AnswerGetResponse, QuestionGetManyResponse>("EXEC dbo.Question_GetMany_BySearch_WithAnswer @Search = @Search",
+                    map: (q, a) =>
+                {
+                    QuestionGetManyResponse question;
+                    if (!questionDictionary.TryGetValue(q.QuestionId, out question))
+                    {
+                        question = q;
+                        question.Answers = new List<AnswerGetResponse>();
+                        questionDictionary.Add(question.QuestionId, question);
+                    }
+                    question.Answers.Add(a);
+                    return question;
+                },
+                     new { Search = search },
+                        splitOn: "QuestionId"
+                )
+                .Distinct()
+                .ToList();
             }
         }
 
@@ -174,7 +201,8 @@ namespace QandA.Data
             }
         }
 
-        public IEnumerable<QuestionGetManyResponse> GetQuestionsBySearchWithPaging(string search,int pageNumber,int pageSize)        {
+        public IEnumerable<QuestionGetManyResponse> GetQuestionsBySearchWithPaging(string search, int pageNumber, int pageSize)
+        {
             using (var connection = new SqlConnection(_connectionString))
             {
                 connection.Open();

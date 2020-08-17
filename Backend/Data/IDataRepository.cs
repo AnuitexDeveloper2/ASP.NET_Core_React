@@ -22,5 +22,6 @@ namespace QandA.Data
         IEnumerable<QuestionGetManyResponse> GetQuestionsWithAnswers();
         IEnumerable<QuestionGetManyResponse> GetQuestionsBySearchWithPaging(string search, int pageNumber, int pageSize);
         Task<IEnumerable<QuestionGetManyResponse>> GetUnansweredQuestionsAsync();
+        IEnumerable<QuestionGetManyResponse> GetQuestionsBySearchWithAnswer(string search);
     }
 }

@@ -9305,11 +9305,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\Anuitex-179\\source\\repos\\QandA\\Backend\\QandA.csproj",
+      "projectUniqueName": "C:\\Users\\Anuitex-179\\source\\repos\\Procedure_Issue\\ASP.NET_Core_React\\Backend\\QandA.csproj",
       "projectName": "QandA",
-      "projectPath": "C:\\Users\\Anuitex-179\\source\\repos\\QandA\\Backend\\QandA.csproj",
+      "projectPath": "C:\\Users\\Anuitex-179\\source\\repos\\Procedure_Issue\\ASP.NET_Core_React\\Backend\\QandA.csproj",
       "packagesPath": "C:\\Users\\Anuitex-179\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\Anuitex-179\\source\\repos\\QandA\\Backend\\obj\\",
+      "outputPath": "C:\\Users\\Anuitex-179\\source\\repos\\Procedure_Issue\\ASP.NET_Core_React\\Backend\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Microsoft\\Xamarin\\NuGet\\"

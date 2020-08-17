@@ -1,6 +1,7 @@
 import styled from '@emotion/styled';
 
 export const PageTitle = styled.h2`
+  color: #824c67;
   font-size: 15px;
   font-weight: bold;
   margin: 10px 0px 5px;

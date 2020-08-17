@@ -6,7 +6,7 @@ export interface QuestionData {
   content: string;
   userName: string;
   created: Date;
-  answers: AnswerData[];
+  answers: AnswerData[] | null;
 }
 
 export interface AnswerData {
@@ -51,10 +51,12 @@ export const mapQuestionFromServer = (
 ): QuestionData => ({
   ...question,
   created: new Date(question.created.substr(0, 19)),
-  answers: question.answers.map((answer) => ({
-    ...answer,
-    created: new Date(answer.created.substr(0, 19)),
-  })),
+  answers: question.answers
+    ? question.answers.map((answer) => ({
+        ...answer,
+        created: new Date(answer.created.substr(0, 19)),
+      }))
+    : null,
 });
 
 export const getUnansweredQuestions = async (): Promise<QuestionData[]> => {
@@ -99,10 +101,10 @@ export const searchQuestions = async (
     const result = await http<undefined, QuestionDataFromServer[]>({
       path: `/questions?search=${criteria}`,
     });
+    debugger;
     if (result.ok && result.parsedBody) {
-      debugger
       const test = result.parsedBody.map(mapQuestionFromServer);
-      return test
+      return test;
     } else {
       return [];
     }

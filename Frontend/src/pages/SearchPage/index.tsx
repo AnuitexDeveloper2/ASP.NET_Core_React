@@ -26,7 +26,7 @@ const SearchPage: React.FC<Props> = ({
 
   useEffect(() => {
     searchQuestions(search);
-  }, [questions, search, searchQuestions]);
+  }, [searchQuestions]);
 
   return (
     <Page title="Search Results">
@@ -42,7 +42,7 @@ const SearchPage: React.FC<Props> = ({
           f or "{search}"
         </p>
       )}
-      <QuestionList data={questions || []} />
+      <QuestionList data={questions || []} isGrid={false} />
     </Page>
   );
 };

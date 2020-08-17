@@ -125,6 +125,30 @@ BEGIN
 END
 GO
 
+CREATE PROC dbo.Question_GetMany_BySearch_WithAnswer
+	(
+		@Search nvarchar(100)
+)
+AS
+BEGIN
+SET NOCOUNT ON
+
+		SELECT q.QuestionId, q.Title, q.Content, q.UserName, q.Created,
+			   a.QuestionId, a.AnswerId, a.Content, a.Username, a.Created
+		FROM dbo.Question q
+		LEFT JOIN dbo.Answer a ON q.QuestionId = a.QuestionId
+		WHERE Title LIKE '%' + @Search + '%'
+
+	UNION
+
+		SELECT q.QuestionId, q.Title, q.Content, q.UserName, q.Created,
+			   a.QuestionId, a.AnswerId, a.Content, a.Username, a.Created
+		FROM dbo.Question q
+		LEFT JOIN dbo.Answer a ON q.QuestionId = a.QuestionId
+		WHERE q.Content LIKE '%' + @Search + '%'
+END
+GO
+
 CREATE PROC dbo.Question_GetMany_BySearch
 	(
 	@Search nvarchar(100)

@@ -17,9 +17,11 @@ export const Question: React.FC<Props> = ({ data, showContent = true }) => {
   let answersLenght = 0;
   const getAnswerLenght = () => {
     if (data !== null) {
-      for (let i = 0; i < answers.length; i++) {
-        if (answers[i].content !== null) {
-          answersLenght++;
+      if (answers !== null) {
+        for (let i = 0; i < answers.length; i++) {
+          if (answers[i].content !== null) {
+            answersLenght++;
+          }
         }
       }
     }
@@ -42,6 +44,7 @@ export const Question: React.FC<Props> = ({ data, showContent = true }) => {
             text-decoration: none;
             color: ${gray2};
             display: inline-block;
+            max-width: 80%;
           `}
           to={`questions?id=${data.questionId}`}
         >
@@ -50,6 +53,7 @@ export const Question: React.FC<Props> = ({ data, showContent = true }) => {
         <div
           css={css`
             float: right;
+            margin-right: 10px;
             display: inline-block;
             align-items: right;
             background-color: #fff;

@@ -26,6 +26,7 @@ import {
   HubConnectionState,
   HubConnection,
 } from '@microsoft/signalr';
+import { PageTitle } from '../../components/PageTitle/PageTitle';
 interface RouteParams {
   questionId: string;
 }
@@ -126,15 +127,17 @@ const QuestionPage: React.FC<Props> = ({ location }) => {
             box-shadow: 0 3px 5px 0 rgba(0, 0, 0, 0.16);
           `}
         >
-          <div
-            css={css`
-              font-size: 19px;
-              font-weight: bold;
-              margin: 10px 0px 5px;
-            `}
-          >
-            {question === null ? '' : question.title}
-          </div>
+          <PageTitle>
+            <div
+              css={css`
+                font-size: 19px;
+                font-weight: bold;
+                margin: 10px 0px 5px;
+              `}
+            >
+              {question === null ? '' : question.title}
+            </div>
+          </PageTitle>
           {question !== null && (
             <Fragment>
               <p
@@ -157,7 +160,7 @@ const QuestionPage: React.FC<Props> = ({ location }) => {
                 ${question.created.toLocaleDateString()}
                 ${question.created.toLocaleTimeString()}`}
               </div>
-              <AnswerList data={question.answers} />
+              {/* <AnswerList data={question.answers} /> */}
               <div
                 css={css`
                   margin-top: 20px;

@@ -32,6 +32,10 @@ const Header: React.FC<RouteComponentProps> = ({ history, location }) => {
         background-color: #fff;
         border-bottom: 1px solid ${gray5};
         box-shadow: 0 3px 7px 0 rgba(110, 112, 114, 0.21);
+
+        @media screen and (max-width: 410px) {
+          padding: 10px 10px;
+        }
       `}
     >
       <Link
@@ -39,8 +43,11 @@ const Header: React.FC<RouteComponentProps> = ({ history, location }) => {
         css={css`
           font-size: 24px;
           font-weight: bold;
-          color: ${gray1};
+          color: #824c67;
           text-decoration: none;
+          @media screen and (max-width: 410px) {
+            font-size: 14px;
+          }
         `}
       >
         Q & A
@@ -64,6 +71,9 @@ const Header: React.FC<RouteComponentProps> = ({ history, location }) => {
             height: 30px;
             :focus {
               outline-color: ${gray5};
+            }
+            @media screen and (max-width: 365px) {
+              width: 150px;
             }
           `}
         />

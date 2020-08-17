@@ -33,7 +33,7 @@ const App: React.FC = () => {
             <Redirect from="/home" to="/" />
             <Route path="/questions" component={QuestionPage} />
             <Route exact path="/" component={HomePage} />
-            <Route path="/signIn" component={SignInPage} />
+            <Route path="/signIn"  component={SignInPage} />
             <Route path="/search" component={SearchPage} />
             <Route path="/ask">
               <Suspense
