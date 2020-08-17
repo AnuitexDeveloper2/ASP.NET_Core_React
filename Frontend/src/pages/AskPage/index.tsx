@@ -15,6 +15,7 @@ import {
 } from '../../redux/actions/postQuestions';
 import { AppState } from '../../redux/reducers/rootReducer';
 import { AnyAction } from 'redux';
+import { useAuth } from '../../components/Auth/Auth';
 
 interface Props {
   postQuestion: (question: PostQuestionData) => Promise<void>;
@@ -32,12 +33,16 @@ const AskPage: React.FC<Props> = ({
       clearPostedQuestion();
     };
   }, [clearPostedQuestion]);
-
+  let userName: string;
+  const { user } = useAuth();
+  if (user !== undefined) {
+    userName = user.name;
+  }
   const handlerSubmit = async (values: Values) => {
     postQuestion({
       title: values.title,
       content: values.content,
-      userName: 'Fred',
+      userName: userName,
       userId: '1',
       created: new Date(),
     });

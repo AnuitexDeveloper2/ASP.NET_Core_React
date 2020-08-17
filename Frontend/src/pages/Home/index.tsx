@@ -11,6 +11,7 @@ import { ThunkDispatch } from 'redux-thunk';
 import { AnyAction } from 'redux';
 import { getUnansweredQuestionsActionCreator } from '../../redux/actions/getQuestions';
 import { AppState } from '../../redux/reducers/rootReducer';
+import { useAuth } from '../../components/Auth/Auth';
 
 interface Props extends RouteComponentProps {
   getUnansweredQuestions: () => Promise<void>;
@@ -28,6 +29,7 @@ const HomePage: FC<Props> = ({
     getUnansweredQuestions();
   }, [getUnansweredQuestions]);
 
+  const { isAuthenticated } = useAuth();
   const handleAskQuestionClick = () => {
     history.push('/ask');
   };
@@ -66,10 +68,12 @@ const HomePage: FC<Props> = ({
             <PageTitle> Unanswered Questions </PageTitle>
           </div>
         </div>
-        <PrimaryButton onClick={handleAskQuestionClick}>
-          {' '}
-          Ask a question{' '}
-        </PrimaryButton>
+        {isAuthenticated && (
+          <PrimaryButton onClick={handleAskQuestionClick}>
+            {' '}
+            Ask a question{' '}
+          </PrimaryButton>
+        )}
       </div>
       {questionsLoading ? (
         <div

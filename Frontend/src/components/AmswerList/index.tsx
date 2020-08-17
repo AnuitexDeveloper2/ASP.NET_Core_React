@@ -5,10 +5,13 @@ import { css, jsx } from '@emotion/core';
 import { gray5 } from '../../Styles';
 import { Answer } from './Answer';
 interface Props {
-  data: AnswerData[];
+  data: AnswerData[] | null;
 }
 
 export const AnswerList: React.FC<Props> = ({ data }) => {
+  if (data === null) {
+    return <div></div>;
+  }
   return (
     <ul
       css={css`

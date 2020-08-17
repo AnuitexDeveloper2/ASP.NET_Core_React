@@ -27,6 +27,7 @@ import {
   HubConnection,
 } from '@microsoft/signalr';
 import { PageTitle } from '../../components/PageTitle/PageTitle';
+import { useAuth } from '../../components/Auth/Auth';
 interface RouteParams {
   questionId: string;
 }
@@ -85,6 +86,8 @@ const QuestionPage: React.FC<Props> = ({ location }) => {
       connection.stop();
     }
   };
+
+  const { isAuthenticated } = useAuth();
 
   useEffect(() => {
     const doGetQuestion = async (id: string) => {
@@ -160,26 +163,28 @@ const QuestionPage: React.FC<Props> = ({ location }) => {
                 ${question.created.toLocaleDateString()}
                 ${question.created.toLocaleTimeString()}`}
               </div>
-              {/* <AnswerList data={question.answers} /> */}
+              <AnswerList data={question.answers} />
               <div
                 css={css`
                   margin-top: 20px;
                 `}
               >
-                <Form
-                  onSubmit={handleSubmit}
-                  failureMessage="There was a problem with your answer"
-                  successMessage="Your answer was successfully submitted"
-                  validationRules={{
-                    content: [
-                      { validator: required },
-                      { validator: minLength, arg: 10 },
-                    ],
-                  }}
-                  submitCaption="Submit Your Answer"
-                >
-                  <Field name="content" label="Your Answer" type="TextArea" />
-                </Form>
+                {isAuthenticated && (
+                  <Form
+                    onSubmit={handleSubmit}
+                    failureMessage="There was a problem with your answer"
+                    successMessage="Your answer was successfully submitted"
+                    validationRules={{
+                      content: [
+                        { validator: required },
+                        { validator: minLength, arg: 10 },
+                      ],
+                    }}
+                    submitCaption="Submit Your Answer"
+                  >
+                    <Field name="content" label="Your Answer" type="TextArea" />
+                  </Form>
+                )}
               </div>
             </Fragment>
           )}

@@ -2,13 +2,32 @@ import React, { ChangeEvent, useState, FormEvent } from 'react';
 import { UserIcon } from '../images/user';
 /** @jsx jsx */
 import { css, jsx } from '@emotion/core';
-import { gray1, fontFamily, fontSize, gray5, gray2 } from '../../Styles';
+import { fontFamily, fontSize, gray5, gray2 } from '../../Styles';
 import { Link, RouteComponentProps, withRouter } from 'react-router-dom';
+import { useAuth } from '../Auth/Auth';
+
+const buttonStyle = css`
+  border: none;
+  font-family: ${fontFamily};
+  font-size: ${fontSize};
+  padding: 5px 10px;
+  background-color: transparent;
+  color: ${gray2};
+  text-decoration: none;
+  cursor: pointer;
+  span {
+    margin-left: 10px;
+  }
+  :focus {
+    outline-color: ${gray5};
+  }
+`;
 
 const Header: React.FC<RouteComponentProps> = ({ history, location }) => {
   const searchParams = new URLSearchParams(location.search);
   const criteria = searchParams.get('criteria') || '';
   const [search, setSearch] = useState(criteria);
+  const { isAuthenticated, user, loading } = useAuth();
   const handleSearchInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     setSearch(e.currentTarget.value);
   };
@@ -78,29 +97,24 @@ const Header: React.FC<RouteComponentProps> = ({ history, location }) => {
           `}
         />
       </form>
-      <Link
-        to="./signin"
-        css={css`
-          font-family: ${fontFamily};
-          font-size: ${fontSize};
-          padding: 5px 10px;
-          background-color: transparent;
-          color: ${gray2};
-          text-decoration: none;
-          cursor: pointer;
-          span {
-            margin-left: 10px;
-          }
-          :focus {
-            outline-color: ${gray5};
-          }
-        `}
-      >
-        <span>
-          <UserIcon />
-        </span>
-        <span>Sign In</span>
-      </Link>
+      {!loading &&
+        (isAuthenticated ? (
+          <div>
+            <span>{user!.name}</span>
+            <Link
+              to={{ pathname: '/signout', state: { local: true } }}
+              css={buttonStyle}
+            >
+              <UserIcon />
+              <span>Sign Out</span>
+            </Link>
+          </div>
+        ) : (
+          <Link to="/signin" css={buttonStyle}>
+            <UserIcon />
+            <span>Sign In</span>
+          </Link>
+        ))}
     </div>
   );
 };

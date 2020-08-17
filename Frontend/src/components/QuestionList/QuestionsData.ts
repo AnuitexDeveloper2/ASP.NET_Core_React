@@ -1,5 +1,5 @@
-import axios from 'axios';
 import { http } from '../../shared/http';
+import { getAccessToken } from '../Auth/Auth';
 export interface QuestionData {
   questionId: number;
   title: string;
@@ -117,21 +117,43 @@ export const searchQuestions = async (
 export const postQuestion = async (
   question: PostQuestionData,
 ): Promise<QuestionData | undefined> => {
-  const newQuestion = await axios.post('https://localhost:44310/questions', {
-    content: question.content,
-    title: question.title,
-    userId: question.userId,
-    // userName: question.userName,
-  });
-  return newQuestion.data;
+  const accessToken = await getAccessToken();
+  try {
+    const result = await http<PostQuestionData, QuestionDataFromServer>({
+      path: '/questions',
+      method: 'post',
+      body: question,
+      accessToken,
+    });
+    if (result.ok && result.parsedBody) {
+      return mapQuestionFromServer(result.parsedBody);
+    } else {
+      return undefined;
+    }
+  } catch (ex) {
+    console.error(ex);
+    return undefined;
+  }
 };
 
 export const postAnswer = async (
   answer: PostAnswerData,
 ): Promise<AnswerData | undefined> => {
-  const request = await axios.post('https://localhost:44310/questions/answer', {
-    content: answer.content,
-    questionId: answer.questionId,
-  });
-  return request.data;
+  const accessToken = await getAccessToken();
+  try {
+    const result = await http<PostAnswerData, AnswerData>({
+      path: '/questions/answer',
+      method: 'post',
+      body: answer,
+      accessToken,
+    });
+    if (result.ok) {
+      return result.parsedBody;
+    } else {
+      return undefined;
+    }
+  } catch (ex) {
+    console.error(ex);
+    return undefined;
+  }
 };
