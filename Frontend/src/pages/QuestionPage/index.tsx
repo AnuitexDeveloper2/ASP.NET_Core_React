@@ -8,13 +8,16 @@ import {
   QuestionData,
   postAnswer,
   getQuestion,
+  deleteQuestion,
+  putQuestion,
 } from '../../components/QuestionList/QuestionsData';
 /** @jsx jsx */
 import { css, jsx } from '@emotion/core';
+import Modal from 'react-modal';
 import { gray3, gray6 } from '../../Styles';
 import { AnswerList } from '../../components/AmswerList';
 import { Field } from '../../components/Field/Field';
-import { Form, Values } from '../../components/Form/Form';
+import { Form, Values, SubmitResult } from '../../components/Form/Form';
 import { required, minLength } from '../../shared/validator';
 import { connect } from 'react-redux';
 import { AppState } from '../../redux/reducers/rootReducer';
@@ -28,6 +31,7 @@ import {
 } from '@microsoft/signalr';
 import { PageTitle } from '../../components/PageTitle/PageTitle';
 import { useAuth } from '../../components/Auth/Auth';
+import { CloseIcon } from '../../components/images/user';
 interface RouteParams {
   questionId: string;
 }
@@ -37,11 +41,13 @@ interface Props extends RouteComponentProps {
   getQuestion: (id: string) => Promise<void>;
 }
 
-const QuestionPage: React.FC<Props> = ({ location }) => {
+const QuestionPage: React.FC<Props> = ({ location, history }) => {
   const [question, setQuestion] = useState<QuestionData | null>(null);
+  const [isEdit, setIsEdit] = useState(false);
   const searchParams = new URLSearchParams(location.search);
   const id = searchParams.get('id') || '';
-
+  const { isAuthenticated, user } = useAuth();
+  let isOwner = false;
   const setUpSignalRConnection = async (questionId: number) => {
     const connection = new HubConnectionBuilder()
       .withUrl('http://localhost:49522/questionshub')
@@ -67,6 +73,15 @@ const QuestionPage: React.FC<Props> = ({ location }) => {
     return connection;
   };
 
+  const removeQuestion = async () => {
+    deleteQuestion(id);
+    history.push('/');
+  };
+
+  const openEditModal = () => {
+    setIsEdit(!isEdit);
+  };
+
   const cleanUpSignalRConnection = async (
     questionId: number,
     connection: HubConnection,
@@ -86,8 +101,6 @@ const QuestionPage: React.FC<Props> = ({ location }) => {
       connection.stop();
     }
   };
-
-  const { isAuthenticated } = useAuth();
 
   useEffect(() => {
     const doGetQuestion = async (id: string) => {
@@ -109,16 +122,38 @@ const QuestionPage: React.FC<Props> = ({ location }) => {
     };
   }, [id]);
 
+  const handlerEdit = async (values: Values) => {
+    const str = "“Warning: react-modal: App element is not defined. Please use `Modal.setAppElement(el)` or set `appElement={el}`”"
+    console.log(str.length)
+    const questionId = parseInt(id);
+    const result = await putQuestion({
+      title: values.title,
+      content: values.content,
+      questionId: questionId,
+    });
+    if (result) {
+      return await { success: true };
+    }
+    return await { success: false }
+  };
+
   const handleSubmit = async (values: Values) => {
     const result = await postAnswer({
       questionId: question!.questionId,
       content: values.content,
-      userName: 'Fred',
+      userName: 'user?.name',
       created: new Date(),
     });
     return { success: result ? true : false };
   };
   if (question !== undefined) {
+    if (user !== undefined) {
+      const userId = user.sub;
+      if (userId === question?.userId) {
+        isOwner = true;
+      }
+    }
+    let submitResult: SubmitResult | undefined;
     return (
       <Page>
         <div
@@ -164,6 +199,46 @@ const QuestionPage: React.FC<Props> = ({ location }) => {
                 ${question.created.toLocaleTimeString()}`}
               </div>
               <AnswerList data={question.answers} />
+              <div>
+                {isOwner && (
+                  <div>
+                    <button
+                      onClick={openEditModal}
+                      css={css`
+                        background-color: rgb(240, 193, 149);
+                        border-color: rgb(240, 146, 59);
+                        border-radius: 5px;
+                        border-style: solid;
+                        color: white;
+                        color: white;
+                        cursor: pointer;
+                        :hover {
+                          background-color: rgb(240, 146, 59);
+                        }
+                      `}
+                    >
+                      Edit question
+                    </button>{' '}
+                    <button
+                      onClick={removeQuestion}
+                      css={css`
+                        background-color: rgb(231, 178, 178);
+                        border-color: red;
+                        border-radius: 5px;
+                        border-style: solid;
+                        color: white;
+                        color: white;
+                        cursor: pointer;
+                        :hover {
+                          background-color: rgb(240, 92, 92);
+                        }
+                      `}
+                    >
+                      Delete question
+                    </button>
+                  </div>
+                )}
+              </div>
               <div
                 css={css`
                   margin-top: 20px;
@@ -189,6 +264,51 @@ const QuestionPage: React.FC<Props> = ({ location }) => {
             </Fragment>
           )}
         </div>
+
+        <Modal
+          isOpen={isEdit}
+          ariaHideApp={false}
+          css={css`
+            margin: 50px;
+            display: contents;
+            border-radius: 10px;
+          `}
+        >
+          <Page title="Edit question">
+            <span onClick={openEditModal}>
+              <CloseIcon />
+            </span>
+            <Form
+              onSubmit={handlerEdit}
+              submitResult={submitResult}
+              failureMessage="There was a problem with edit question"
+              successMessage="Your question was successfully edited"
+              validationRules={{
+                title: [
+                  { validator: required },
+                  { validator: minLength, arg: 10 },
+                ],
+                content: [
+                  { validator: required },
+                  { validator: minLength, arg: 10 },
+                ],
+              }}
+              submitCaption="Submit your edit question"
+            >
+              <Field
+                name="title"
+                label="Title"
+                defaultValue={question?.title}
+              ></Field>
+              <Field
+                name="content"
+                label="Content"
+                type="TextArea"
+                defaultValue={question?.content}
+              ></Field>
+            </Form>
+          </Page>
+        </Modal>
       </Page>
     );
   }

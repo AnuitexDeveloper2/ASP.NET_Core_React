@@ -9,7 +9,6 @@ interface Props {
 }
 
 export const SignInPage: React.FC<Props> = ({ action }) => {
-  debugger;
   const { signIn } = useAuth();
   if (action === 'signin') {
     signIn();

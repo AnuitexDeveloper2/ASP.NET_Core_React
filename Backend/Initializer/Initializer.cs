@@ -14,6 +14,8 @@ namespace QandA.Initializer
     {
         public static void initServices(IServiceCollection services)
         {
+            int test = 10;
+            string some = Convert.ToString(test);
             services.AddScoped<IDataRepository, DataRepository>();
             services.AddScoped<IAuthorizationHandler, MustBeQuestionAuthorHandler>();
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();

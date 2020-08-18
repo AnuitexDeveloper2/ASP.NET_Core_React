@@ -81,7 +81,7 @@ namespace QandA.Controllers
                 Title = questionPost.Title,
                 Content = questionPost.Content,
                 UserId = User.FindFirst(ClaimTypes.NameIdentifier).Value,
-                UserName = "bob.test@test.com",
+                UserName = questionPost.UserName,
                 Created = DateTime.UtcNow
             });
             if (result == null)
@@ -94,9 +94,9 @@ namespace QandA.Controllers
 
         [Authorize(Policy = "MustBeQuestionAuthor")]
         [HttpPut]
-        public async Task<ActionResult<QuestionGetSingleResponse>> PutQuestion(int questionId, QuestionPutRequest questionPut)
+        public async Task<ActionResult<QuestionGetSingleResponse>> PutQuestion(QuestionPutRequest questionPut)
         {
-            var result = await _dataRepository.GetQuestion(questionId);
+            var result = await _dataRepository.GetQuestion(questionPut.QuestionId);
             if (result == null)
             {
                 return NotFound();
@@ -107,7 +107,7 @@ namespace QandA.Controllers
             result.Title : questionPut.Title;
             questionPut.Content = string.IsNullOrEmpty(questionPut.Content) ? result.Content : questionPut.Content;
 
-            var savedQuestion = await _dataRepository.PutQuestion(questionId, questionPut);
+            var savedQuestion = await _dataRepository.PutQuestion(questionPut.QuestionId, questionPut);
             return savedQuestion;
         }
 
@@ -115,7 +115,7 @@ namespace QandA.Controllers
         [HttpDelete]
         public async Task<ActionResult> DeleteQuestion(int questionId)
         {
-            var question = _dataRepository.GetQuestion(questionId);
+            var question = await _dataRepository.GetQuestion(questionId);
             if (question == null)
             {
                 return NotFound();

@@ -13,7 +13,7 @@ import { Provider } from 'react-redux';
 import { configureStore } from './redux/store';
 import { AuthProvider } from './components/Auth/Auth';
 import { SignOutPage } from './pages/SignOutPage/index.ts';
-import { AuthorizedPage } from './components/AuthorizedPage.';
+import { AuthorizedPage } from './components/AuthorizedPage';
 
 const AskPage = lazy(() => import('./pages/AskPage'));
 

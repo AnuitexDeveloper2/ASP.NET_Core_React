@@ -12,6 +12,7 @@ import { authSettings } from '../../shared/AppSettings';
 interface Auth0User {
   name: string;
   email: string;
+  sub: string;
 }
 
 interface IAuth0Context {

@@ -8,6 +8,7 @@ interface Props {
   name: string;
   label?: string;
   type?: 'Text' | 'TextArea' | 'Password';
+  defaultValue?: string;
 }
 
 const baseCSS = css`
@@ -29,7 +30,12 @@ const baseCSS = css`
   }
 `;
 
-export const Field: React.FC<Props> = ({ name, label, type = 'Text' }) => {
+export const Field: React.FC<Props> = ({
+  name,
+  label,
+  type = 'Text',
+  defaultValue = '',
+}) => {
   const { setValue, touched, validate, setTouched } = useContext(FormContext);
   const handleChange = (
     e: ChangeEvent<HTMLInputElement> | ChangeEvent<HTMLTextAreaElement>,
@@ -77,7 +83,7 @@ export const Field: React.FC<Props> = ({ name, label, type = 'Text' }) => {
           {(type === 'Text' || type === 'Password') && (
             <input
               type={type.toLowerCase()}
-              value={values[name] === undefined ? '' : values[name]}
+              value={values[name] === undefined ? defaultValue : values[name]}
               id={name}
               onChange={handleChange}
               onBlur={handleBlur}
@@ -87,6 +93,7 @@ export const Field: React.FC<Props> = ({ name, label, type = 'Text' }) => {
           {type === 'TextArea' && (
             <textarea
               id={name}
+              defaultValue={defaultValue}
               onChange={handleChange}
               onBlur={handleBlur}
               css={css`

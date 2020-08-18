@@ -5,6 +5,8 @@ export interface QuestionData {
   title: string;
   content: string;
   userName: string;
+  userEmail: string;
+  userId: string;
   created: Date;
   answers: AnswerData[] | null;
 }
@@ -28,6 +30,8 @@ export interface QuestionDataFromServer {
   title: string;
   content: string;
   userName: string;
+  userEmail: string;
+  userId: string;
   created: string;
   answers: AnswerDataFromServer[];
 }
@@ -53,9 +57,9 @@ export const mapQuestionFromServer = (
   created: new Date(question.created.substr(0, 19)),
   answers: question.answers
     ? question.answers.map((answer) => ({
-        ...answer,
-        created: new Date(answer.created.substr(0, 19)),
-      }))
+      ...answer,
+      created: new Date(answer.created.substr(0, 19)),
+    }))
     : null,
 });
 
@@ -101,7 +105,6 @@ export const searchQuestions = async (
     const result = await http<undefined, QuestionDataFromServer[]>({
       path: `/questions?search=${criteria}`,
     });
-    debugger;
     if (result.ok && result.parsedBody) {
       const test = result.parsedBody.map(mapQuestionFromServer);
       return test;
@@ -157,3 +160,49 @@ export const postAnswer = async (
     return undefined;
   }
 };
+
+export const deleteQuestion = async (questionId: string): Promise<boolean> => {
+  const accessToken = await getAccessToken();
+  const id = parseInt(questionId);
+  try {
+    const result = await http({
+      path: `/questions?questionId=${id}`,
+      method: 'delete',
+      accessToken,
+    });
+    if (result.ok) {
+      return true;
+    } else {
+      return false;
+    }
+  } catch (ex) {
+    console.error(ex);
+    return false;
+  }
+};
+
+export interface QuestionPutRequest {
+  title: string;
+  content: string;
+  questionId: number;
+}
+
+export const putQuestion = async (data: QuestionPutRequest) => {
+  const accessToken = await getAccessToken();
+  try {
+    const result = await http({
+      path: `/questions`,
+      method: 'put',
+      body: data,
+      accessToken,
+    });
+    if (result.ok) {
+      return true;
+    } else {
+      return false;
+    }
+  } catch (ex) {
+    console.error(ex);
+    return false;
+  }
+}

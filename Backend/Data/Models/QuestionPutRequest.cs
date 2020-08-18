@@ -8,8 +8,9 @@ namespace QandA.Data.Models
 {
     public class QuestionPutRequest
     {
-        [StringLength(100)]
+        [StringLength(150)]
         public string Title { get; set; }
         public string Content { get; set; }
+        public int QuestionId { get; set; }
     }
 }

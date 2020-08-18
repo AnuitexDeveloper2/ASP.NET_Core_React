@@ -64,7 +64,7 @@ const Header: React.FC<RouteComponentProps> = ({ history, location }) => {
           font-weight: bold;
           color: #824c67;
           text-decoration: none;
-          @media screen and (max-width: 410px) {
+          @media screen and (max-width: 510px) {
             font-size: 14px;
           }
         `}
@@ -99,8 +99,22 @@ const Header: React.FC<RouteComponentProps> = ({ history, location }) => {
       </form>
       {!loading &&
         (isAuthenticated ? (
-          <div>
-            <span>{user!.name}</span>
+          <div
+            css={css`
+              @media screen and (max-width: 440px) {
+                font-size: 10px;
+              }
+            `}
+          >
+            <span
+              css={css`
+                @media screen and (max-width: 560px) {
+                  font-size: 12px;
+                }
+              `}
+            >
+              {user!.name}
+            </span>
             <Link
               to={{ pathname: '/signout', state: { local: true } }}
               css={buttonStyle}
