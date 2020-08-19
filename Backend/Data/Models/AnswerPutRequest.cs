@@ -5,13 +5,9 @@ using System.Threading.Tasks;
 
 namespace QandA.Data.Models
 {
-    public class AnswerGetResponse
+    public class AnswerPutRequest
     {
         public int AnswerId { get; set; }
         public string Content { get; set; }
-        public string UserName { get; set; }
-        public string UserId { get; set; }
-        public DateTime Created { get; set; }
-
     }
 }

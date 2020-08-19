@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Dispatch, SetStateAction } from 'react';
 import { AnswerData } from '../QuestionList/QuestionsData';
 /** @jsx jsx */
 import { css, jsx } from '@emotion/core';
@@ -6,9 +6,17 @@ import { gray5 } from '../../Styles';
 import { Answer } from './Answer';
 interface Props {
   data: AnswerData[] | null;
+  answerEditModal: Dispatch<SetStateAction<boolean>>;
+  setAnswerEditText: Dispatch<SetStateAction<string>>;
+  setEditAnswerId: Dispatch<SetStateAction<number>>;
 }
 
-export const AnswerList: React.FC<Props> = ({ data }) => {
+export const AnswerList: React.FC<Props> = ({
+  data,
+  answerEditModal,
+  setAnswerEditText,
+  setEditAnswerId,
+}) => {
   if (data === null) {
     return <div></div>;
   }
@@ -27,7 +35,12 @@ export const AnswerList: React.FC<Props> = ({ data }) => {
           `}
           key={answer.answerId}
         >
-          <Answer data={answer} />
+          <Answer
+            data={answer}
+            answerEditModal={answerEditModal}
+            answerEditText={setAnswerEditText}
+            setEditAnswerId={setEditAnswerId}
+          />
         </li>
       ))}
     </ul>

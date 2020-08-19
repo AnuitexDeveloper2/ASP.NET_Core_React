@@ -15,9 +15,14 @@ export interface AnswerData {
   answerId: number;
   content: string;
   userName: string;
+  userId: string;
   created: Date;
 }
 
+export interface PutAnswerData {
+  answerId: number;
+  content: string;
+}
 export interface PostAnswerData {
   questionId: number;
   content: string;
@@ -39,6 +44,7 @@ export interface AnswerDataFromServer {
   answerId: number;
   content: string;
   userName: string;
+  userId: string;
   created: string;
 }
 
@@ -57,9 +63,9 @@ export const mapQuestionFromServer = (
   created: new Date(question.created.substr(0, 19)),
   answers: question.answers
     ? question.answers.map((answer) => ({
-      ...answer,
-      created: new Date(answer.created.substr(0, 19)),
-    }))
+        ...answer,
+        created: new Date(answer.created.substr(0, 19)),
+      }))
     : null,
 });
 
@@ -205,4 +211,43 @@ export const putQuestion = async (data: QuestionPutRequest) => {
     console.error(ex);
     return false;
   }
-}
+};
+
+export const putAnswer = async (data: PutAnswerData): Promise<boolean> => {
+  const accessToken = await getAccessToken();
+  try {
+    const result = await http<PutAnswerData, boolean>({
+      path: `/questions/answer`,
+      method: 'put',
+      body: data,
+      accessToken,
+    });
+    if (result.ok) {
+      return true;
+    } else {
+      return false;
+    }
+  } catch (ex) {
+    console.error(ex);
+    return false;
+  }
+};
+
+export const deleteAnswer = async (id: number): Promise<boolean> => {
+  const accessToken = await getAccessToken();
+  try {
+    const result = await http({
+      path: `/questions/answer?id=${id}`,
+      method: 'delete',
+      accessToken,
+    });
+    if (result.ok) {
+      return true;
+    } else {
+      return false;
+    }
+  } catch (ex) {
+    console.error(ex);
+    return false;
+  }
+};

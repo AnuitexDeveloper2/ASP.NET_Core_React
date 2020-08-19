@@ -26,7 +26,7 @@ const SearchPage: React.FC<Props> = ({
 
   useEffect(() => {
     searchQuestions(search);
-  }, [searchQuestions]);
+  }, [search, searchQuestions]);
 
   return (
     <Page title="Search Results">

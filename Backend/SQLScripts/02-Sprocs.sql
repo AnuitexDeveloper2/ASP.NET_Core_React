@@ -20,7 +20,7 @@ AS
 BEGIN
 	SET NOCOUNT ON
 
-	SELECT AnswerId, QuestionId, Content, Username, Created
+	SELECT AnswerId, QuestionId, Content, Username, Created, UserId
 	FROM dbo.Answer 
 	WHERE QuestionId = @QuestionId
 END

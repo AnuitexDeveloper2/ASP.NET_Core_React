@@ -10,6 +10,7 @@ import {
   getQuestion,
   deleteQuestion,
   putQuestion,
+  putAnswer,
 } from '../../components/QuestionList/QuestionsData';
 /** @jsx jsx */
 import { css, jsx } from '@emotion/core';
@@ -32,6 +33,7 @@ import {
 import { PageTitle } from '../../components/PageTitle/PageTitle';
 import { useAuth } from '../../components/Auth/Auth';
 import { CloseIcon } from '../../components/images/user';
+import { EditDeleteButtons } from '../../components/EditDeleteButton/EditDeleteButtons';
 interface RouteParams {
   questionId: string;
 }
@@ -43,7 +45,10 @@ interface Props extends RouteComponentProps {
 
 const QuestionPage: React.FC<Props> = ({ location, history }) => {
   const [question, setQuestion] = useState<QuestionData | null>(null);
-  const [isEdit, setIsEdit] = useState(false);
+  const [isEditQuestion, setIsEditQuestion] = useState<boolean>(false);
+  const [isEditAnswer, setIsEditAnswer] = useState<boolean>(false);
+  const [editAnswerText, setEditAnswerText] = useState<string>('');
+  const [editAnswerId, setEditAnswerId] = useState<number>(0);
   const searchParams = new URLSearchParams(location.search);
   const id = searchParams.get('id') || '';
   const { isAuthenticated, user } = useAuth();
@@ -78,8 +83,8 @@ const QuestionPage: React.FC<Props> = ({ location, history }) => {
     history.push('/');
   };
 
-  const openEditModal = () => {
-    setIsEdit(!isEdit);
+  const openEditQuestionModal = () => {
+    setIsEditQuestion(!isEditQuestion);
   };
 
   const cleanUpSignalRConnection = async (
@@ -123,8 +128,6 @@ const QuestionPage: React.FC<Props> = ({ location, history }) => {
   }, [id]);
 
   const handlerEdit = async (values: Values) => {
-    const str = "“Warning: react-modal: App element is not defined. Please use `Modal.setAppElement(el)` or set `appElement={el}`”"
-    console.log(str.length)
     const questionId = parseInt(id);
     const result = await putQuestion({
       title: values.title,
@@ -134,7 +137,11 @@ const QuestionPage: React.FC<Props> = ({ location, history }) => {
     if (result) {
       return await { success: true };
     }
-    return await { success: false }
+    return await { success: false };
+  };
+
+  const closeEditAnswerModal = () => {
+    setIsEditAnswer(false);
   };
 
   const handleSubmit = async (values: Values) => {
@@ -146,6 +153,15 @@ const QuestionPage: React.FC<Props> = ({ location, history }) => {
     });
     return { success: result ? true : false };
   };
+
+  const handleEditAnswer = async (values: Values) => {
+    await putAnswer({
+      answerId: editAnswerId,
+      content: values.content,
+    });
+    return { success: true };
+  };
+
   if (question !== undefined) {
     if (user !== undefined) {
       const userId = user.sub;
@@ -165,6 +181,14 @@ const QuestionPage: React.FC<Props> = ({ location, history }) => {
             box-shadow: 0 3px 5px 0 rgba(0, 0, 0, 0.16);
           `}
         >
+          {isOwner && (
+            <EditDeleteButtons
+              editContent="Edit question"
+              deleteContent="Delete question"
+              remove={removeQuestion}
+              openEditModal={openEditQuestionModal}
+            />
+          )}
           <PageTitle>
             <div
               css={css`
@@ -198,47 +222,13 @@ const QuestionPage: React.FC<Props> = ({ location, history }) => {
                 ${question.created.toLocaleDateString()}
                 ${question.created.toLocaleTimeString()}`}
               </div>
-              <AnswerList data={question.answers} />
-              <div>
-                {isOwner && (
-                  <div>
-                    <button
-                      onClick={openEditModal}
-                      css={css`
-                        background-color: rgb(240, 193, 149);
-                        border-color: rgb(240, 146, 59);
-                        border-radius: 5px;
-                        border-style: solid;
-                        color: white;
-                        color: white;
-                        cursor: pointer;
-                        :hover {
-                          background-color: rgb(240, 146, 59);
-                        }
-                      `}
-                    >
-                      Edit question
-                    </button>{' '}
-                    <button
-                      onClick={removeQuestion}
-                      css={css`
-                        background-color: rgb(231, 178, 178);
-                        border-color: red;
-                        border-radius: 5px;
-                        border-style: solid;
-                        color: white;
-                        color: white;
-                        cursor: pointer;
-                        :hover {
-                          background-color: rgb(240, 92, 92);
-                        }
-                      `}
-                    >
-                      Delete question
-                    </button>
-                  </div>
-                )}
-              </div>
+              <AnswerList
+                data={question.answers}
+                answerEditModal={setIsEditAnswer}
+                setAnswerEditText={setEditAnswerText}
+                setEditAnswerId={setEditAnswerId}
+              />
+              <div></div>
               <div
                 css={css`
                   margin-top: 20px;
@@ -266,7 +256,7 @@ const QuestionPage: React.FC<Props> = ({ location, history }) => {
         </div>
 
         <Modal
-          isOpen={isEdit}
+          isOpen={isEditQuestion}
           ariaHideApp={false}
           css={css`
             margin: 50px;
@@ -275,7 +265,7 @@ const QuestionPage: React.FC<Props> = ({ location, history }) => {
           `}
         >
           <Page title="Edit question">
-            <span onClick={openEditModal}>
+            <span onClick={openEditQuestionModal}>
               <CloseIcon />
             </span>
             <Form
@@ -306,6 +296,40 @@ const QuestionPage: React.FC<Props> = ({ location, history }) => {
                 type="TextArea"
                 defaultValue={question?.content}
               ></Field>
+            </Form>
+          </Page>
+        </Modal>
+        <Modal
+          isOpen={isEditAnswer}
+          ariaHideApp={false}
+          css={css`
+            margin: 50px;
+            display: contents;
+            border-radius: 10px;
+          `}
+        >
+          <Page>
+            <span onClick={closeEditAnswerModal}>
+              <CloseIcon />
+            </span>
+            <Form
+              onSubmit={handleEditAnswer}
+              failureMessage="There was a problem with your answer"
+              successMessage="Your answer was successfully submitted"
+              validationRules={{
+                content: [
+                  { validator: required },
+                  { validator: minLength, arg: 10 },
+                ],
+              }}
+              submitCaption="Edit Your Answer"
+            >
+              <Field
+                name="content"
+                label="Your Answer"
+                type="TextArea"
+                defaultValue={editAnswerText}
+              />
             </Form>
           </Page>
         </Modal>

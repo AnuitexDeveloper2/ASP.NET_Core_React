@@ -225,10 +225,37 @@ namespace QandA.Data
             using (var connection = new SqlConnection(_connectionString))
             {
                 await connection.OpenAsync();
-                return await
-                connection.QueryAsync<QuestionGetManyResponse>(
-                "EXEC dbo.Question_GetUnanswered");
+                return await connection.QueryAsync<QuestionGetManyResponse>("EXEC dbo.Question_GetUnanswered");
             }
+        }
+
+        public async Task<int> PutAnswer(AnswerPutRequest answerPut)
+        {
+            using (var connection = new SqlConnection(_connectionString))
+            {
+                await connection.OpenAsync();
+                var result = connection.Execute(
+                    @"EXEC dbo.Answer_Put
+                @AnswerId = @AnswerId, @Content = @Content",
+                new { AnswerId = answerPut.AnswerId, Content = answerPut.Content }
+                );
+                return result;
+            }
+        }
+
+        public async Task<int> DeleteAnswer(int id)
+        {
+            using (var connection = new SqlConnection(_connectionString))
+            {
+                await connection.OpenAsync();
+                var result =  connection.Execute(
+                    @"EXEC dbo.Answer_Delete
+                    @AnswerId = @AnswerId",
+                    new {AnswerId = id}
+                    );
+                return result;
+            }
+
         }
     }
 }

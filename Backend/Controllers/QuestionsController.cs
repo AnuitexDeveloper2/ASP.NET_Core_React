@@ -147,6 +147,21 @@ namespace QandA.Controllers
 
             return savedAnswer;
         }
+        [Authorize]
+        [HttpPut("answer")]
+        public async Task<ActionResult> PutAnswerAsync (AnswerPutRequest answerPut)
+        {
+            var savedAnswer =await _dataRepository.PutAnswer(answerPut);
+            return Ok("savedAnswer");
+        }
+
+        [Authorize]
+        [HttpDelete("answer")]
+        public async Task<ActionResult> DeleteAnswer (int id)
+        {
+            var result = await _dataRepository.DeleteAnswer(id);
+            return Ok();
+        }
 
         private async Task<string> GetUserName()
         {
